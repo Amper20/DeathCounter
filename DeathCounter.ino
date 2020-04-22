@@ -37,13 +37,24 @@ void setup() {
 		delay(500);
 		Serial.print(".");
 	}
-
+	Serial.println("stratup");
+	
 	timeClient.begin();
-	timeClient.update();
-	delay(1000);
+	
+	while(!timeClient.update())
+		delay(100);
+	
 	age = timeClient.getEpochTime();
+	
 	Serial.println(age);
+	
 	timeClient.end();
+	
+	WiFi.disconnect();
+	WiFi.mode(WIFI_OFF);
+	WiFi.forceSleepBegin();
+	delay(1);
+
 	timeStamp = millis();
 	updateBrightness();
 }
@@ -60,7 +71,7 @@ void loop() {
 		Serial.println(seconds);
 	}
 
-	if (millis() - brightTimeStamp >= 2000) {
+	if (millis() - brightTimeStamp >= 300000) {
 		brightTimeStamp = millis();
 		updateBrightness();
 	}
