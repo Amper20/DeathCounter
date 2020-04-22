@@ -40,25 +40,30 @@ void setup() {
 
 	timeClient.begin();
 	timeClient.update();
+	delay(1000);
 	age = timeClient.getEpochTime();
+	Serial.println(age);
 	timeClient.end();
 	timeStamp = millis();
 	updateBrightness();
 }
 
 void loop() {
-	
+
+	uint32_t seconds = adiosAmigos - age - startupTime;
+
 	if (millis() - timeStamp >= 1000) {
 		startupTime += (millis() - timeStamp)/1000;
 		timeStamp = millis();
+		Serial.println(age);
+		Serial.println(startupTime);
+		Serial.println(seconds);
 	}
 
 	if (millis() - brightTimeStamp >= 2000) {
 		brightTimeStamp = millis();
 		updateBrightness();
 	}
-	uint32_t seconds = adiosAmigos - age - startupTime;
-
 	if(mode)
 		rainbowCycle(seconds);
 	else
