@@ -49,11 +49,11 @@ void setup() {
 void loop() {
 	
 	if (millis() - timeStamp >= 1000) {
+		startupTime += (millis() - timeStamp)/1000;
 		timeStamp = millis();
-		startupTime += 1;
 	}
 
-	if (millis() - brightTimeStamp >= 300000) {
+	if (millis() - brightTimeStamp >= 2000) {
 		brightTimeStamp = millis();
 		updateBrightness();
 	}
@@ -73,20 +73,37 @@ void loop() {
 }
 
 void updateBrightness() {
-	uint32_t avg = 0;
+	uint32_t avg = 0, x = 0, mx_local = 0, cnt = 1;
 	for (int i = 0; i < 20; i++) {
-		avg += analogRead(A0);
+		x = analogRead(A0);
+		if (x > mx_local) {
+			mx_local = x;
+			avg += x;
+			cnt++;
+		}
 		delay(20);
 	}
-	avg /= 20;
+	avg /= cnt;
 	mini = (avg < mini ? avg : mini);
 	maxi = (avg > maxi ? avg : maxi);
 	
 	Serial.println(avg);
-	if (avg < 30)
+	if (avg < 10) {
 		LED.setBrightness(0);
-	else
-		LED.setBrightness(map(avg, mini, maxi, 0, 255));
+		return;
+	}
+	if (avg < 30) {
+		LED.setBrightness(100);
+		return;
+	}
+	if (avg < 50) {
+		LED.setBrightness(150);
+		return;
+	}
+	if (avg < 100) {
+		LED.setBrightness(255);
+		return;
+	}
 }
 
 uint32_t getFade() {
